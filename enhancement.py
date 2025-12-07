@@ -8,7 +8,7 @@ import torch
 import os
 from argparse import ArgumentParser
 import time
-from pypapi import events, papi_high as high
+# from pypapi import events, papi_high as high  # Optional dependency, not used
 
 from sgmse.backbones.shared import BackboneRegistry
 from sgmse.data_module import SpecsDataModule
@@ -58,14 +58,18 @@ model = model_cls.load_from_checkpoint(
 	batch_size=1, num_workers=0, kwargs=dict(gpu=False)
 )
 model.eval(no_ema=False)
-model.cuda()
+# Only use CUDA if available (not on macOS)
+if torch.cuda.is_available():
+	model.cuda()
+else:
+	model.cpu()  # Use CPU on macOS or systems without CUDA
 
 noisy_files = sorted(glob.glob(os.path.join(args.test_dir, "*.wav")))
 
 # Loop on files
 for f in tqdm.tqdm(noisy_files):
 
-	y, sample_sr = torchaudio.load(f)
+	y, sample_sr = load(f)
 	assert sample_sr == model_sr, "You need to make sure sample_sr matches model_sr --> resample to 16kHz"
 	x_hat = model.enhance(y, corrector=args.corrector, N=args.N, corrector_steps=args.corrector_steps, snr=args.snr)
 

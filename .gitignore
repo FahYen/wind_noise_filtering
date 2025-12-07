@@ -2,6 +2,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,macos,linux,emacs,windows,jupyternotebooks
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode,macos,linux,emacs,windows,jupyternotebooks
 
+*.ckpt
+
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~

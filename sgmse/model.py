@@ -282,7 +282,8 @@ class ScoreModel(pl.LightningModule):
         T_orig = y.size(1)
         norm_factor = y.abs().max().item()
         y = y / norm_factor
-        Y = torch.unsqueeze(self._forward_transform(self._stft(y.cuda())), 0)
+        device = next(self.parameters()).device  # Get model's device
+        Y = torch.unsqueeze(self._forward_transform(self._stft(y.to(device))), 0)
         Y = pad_spec(Y)
         if sampler_type == "pc":
             sampler = self.get_pc_sampler(predictor, corrector, Y, N=N,
@@ -353,10 +354,11 @@ class DiscriminativeModel(ScoreModel):
             norm_factor = y.abs().max().item()
             T_orig = y.size(1)
 
+            device = next(self.parameters()).device  # Get model's device
             if self.data_module.return_time:
-                Y = torch.unsqueeze((y/norm_factor).cuda(), 0) #1,D=1,T
+                Y = torch.unsqueeze((y/norm_factor).to(device), 0) #1,D=1,T
             else:
-                Y = torch.unsqueeze(self._forward_transform(self._stft((y/norm_factor).cuda())), 0) #1,D,F,T
+                Y = torch.unsqueeze(self._forward_transform(self._stft((y/norm_factor).to(device))), 0) #1,D,F,T
                 Y = pad_spec(Y)
             X_hat = self(Y)
             if self.dnn.FORCE_STFT_OUT:
@@ -729,7 +731,8 @@ class StochasticRegenerationModel(pl.LightningModule):
         T_orig = y.size(1)
         norm_factor = y.abs().max().item()
         y = y / norm_factor
-        Y = torch.unsqueeze(self._forward_transform(self._stft(y.cuda())), 0)
+        device = next(self.parameters()).device  # Get model's device
+        Y = torch.unsqueeze(self._forward_transform(self._stft(y.to(device))), 0)
         Y = pad_spec(Y)
         with torch.no_grad():
 

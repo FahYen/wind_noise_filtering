@@ -3,7 +3,10 @@ from torchaudio import load
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import soundfile as sf
+try:
+    import soundfile as sf
+except (OSError, ImportError):
+    sf = None  # Optional dependency for visualization only
 import glob
 
 # Plotting settings
